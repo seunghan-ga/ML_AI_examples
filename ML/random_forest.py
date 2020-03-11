@@ -9,7 +9,7 @@ import sklearn
 
 if __name__ == "__main__":
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=False)
+    mnist = input_data.read_data_sets("./tmp/data/", one_hot=False)
 
     # Parameters
     num_steps = 500  # Total steps to train

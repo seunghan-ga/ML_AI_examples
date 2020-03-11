@@ -14,8 +14,7 @@ if __name__ == "__main__":
     # Set verbosity to display errors only (Remove this line for showing warnings)
     tf.logging.set_verbosity(tf.logging.ERROR)
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=False,
-                                      source_url='http://yann.lecun.com/exdb/mnist/')
+    mnist = input_data.read_data_sets("./tmp/data/", one_hot=False, source_url='http://yann.lecun.com/exdb/mnist/')
 
     # Parameters
     batch_size = 4096 # The number of samples per batch
