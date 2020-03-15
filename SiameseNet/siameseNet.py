@@ -41,14 +41,13 @@ def get_model(input_shape=(105, 105, 1)):
                                        bias_initializer=tf.keras.initializers.random_normal(0.5, 1e-2))(L1_distance)
     siamese_net = tf.keras.models.Model(inputs=[left_input, right_input], outputs=prediction)
 
-    # optimizer = tf.keras.optimizers.Adam(0.00006)
-    # siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer)
+    optimizer = tf.keras.optimizers.Adam(0.00006)
+    siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer)
 
     return siamese_net
 
 
 if __name__ == "__main__":
     model = get_model()
-    model.compile(loss="binary_crossentropy",optimizer=tf.keras.optimizers.Adam(0.00006))
     model.count_params()
     model.summary()
