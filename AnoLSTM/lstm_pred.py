@@ -62,14 +62,14 @@ def outlier_detection(data, params):
     scaler = joblib.load(str(params['scaler_path']))
     print('Loaded scaler from disk')
 
-    # model load
+    # models load
     json_file = open(str(params['model_json_path']), 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = tf.keras.models.model_from_json(loaded_model_json)
     loaded_model.load_weights(str(params['model_path']))
     LSTM_Model = loaded_model
-    print('Loaded model from disk')
+    print('Loaded models from disk')
 
     # dataset
     columns = params['features'].split(',')

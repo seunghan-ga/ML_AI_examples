@@ -77,7 +77,7 @@ if __name__ == "__main__":
     scaler = MinMaxScaler(feature_range=(0, 1)).fit(LSTM_autoencoder().flatten(train))
     scaled_train = LSTM_autoencoder().scale(train, scaler)
 
-    # get model
+    # get models
     LSTM_Model = LSTM_autoencoder().get_model(timesteps=timesteps,
                                               n_features=n_features,
                                               units=units,
@@ -89,7 +89,7 @@ if __name__ == "__main__":
                                               dropout=0.3)
     LSTM_Model.summary()
 
-    # fit model
+    # fit models
     MODEL_SAVE_PATH = "./models/checkpoints/"
     model_path = MODEL_SAVE_PATH + '{epoch:03d}-{val_loss:.5f}.hdf5'
     cb_checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=model_path, monitor='val_loss', verbose=1,
@@ -108,9 +108,9 @@ if __name__ == "__main__":
     joblib.dump(scaler, "models/normalization.scaler")
     print("Saved scaler to disk")
 
-    # model save
-    model_json = LSTM_Model.to_json()  # serialize model to JSON
+    # models save
+    model_json = LSTM_Model.to_json()  # serialize models to JSON
     json_file = open("models/model.json", "w")
     json_file.write(model_json)
-    LSTM_Model.save_weights("models/model.h5")  # serialize weights to HDF5
-    print("Saved model to disk")
+    LSTM_Model.save_weights("models/models.h5")  # serialize weights to HDF5
+    print("Saved models to disk")

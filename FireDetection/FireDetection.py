@@ -135,13 +135,13 @@ class FireDetection(object):
         # Arguments
             include_top: whether to include the fully-connected layer at the top of the network.
             weights: one of `None` (random initialization) or `'imagenet'` (pre-training on ImageNet).
-            input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as image input for the model.
+            input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as image input for the models.
             input_shape: optional shape tuple, only to be specified if `include_top` is `False` (otherwise the input
                 shape has to be `(299, 299, 3)` (with `channels_last` data format) or `(3, 299, 299)`.
             pooling: Optional pooling mode for feature extraction when `include_top` is `False`.
-                - `None` means that the output of the model will be the 4D tensor output of the last convolutional layer.
+                - `None` means that the output of the models will be the 4D tensor output of the last convolutional layer.
                 - `'avg'` means that global average pooling will be applied to the output of thelast convolutional layer,
-                    and thus the output of the model will be a 2D tensor.
+                    and thus the output of the models will be a 2D tensor.
                 - `'max'` means that global max pooling will be applied.
             classes: optional number of classes to classify images into, only to be specified if `include_top` is `True`,
                 and if no `weights` argument is specified.
@@ -238,13 +238,13 @@ class FireDetection(object):
             elif pooling == 'max':
                 x = tf.keras.layers.GlobalMaxPooling2D(name='MaxPool')(x)
 
-        # Ensure that the model takes into account any potential predecessors of `input_tensor`
+        # Ensure that the models takes into account any potential predecessors of `input_tensor`
         if input_tensor is not None:
             inputs = tf.keras.utils.get_source_inputs(input_tensor)
         else:
             inputs = img_input
 
-        # Create model
+        # Create models
         model = tf.keras.models.Model(inputs, x, name='inception_resnet_v2')
 
         # Load weights - imagenet
