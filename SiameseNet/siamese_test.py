@@ -24,11 +24,20 @@ if __name__ == "__main__":
         print("training accuracy:", acc * 100)
     else:  # testing
         model.load_weights("./models/one_way_model.h5")
-        for i in range(10):
+        n_correct = 0
+        sum_incorrect = 0
+        epochs = 250
+        for i in range(epochs):
             cat_list = [0, 20, 40, 60, 80, 100]
             start = np.random.choice(cat_list, 1)[0]
-            epochs = 20
             query_idx = np.random.randint(start, start + 20, 1)[0]
             query = x_test[query_idx]
-            pred = siamese.predict(model, query, x_train, categories, indices)
-            print(start, categories[cat_list.index(start)], query_idx, "->", pred)
+            pred = siamese.predict(model, query, x_train, indices, categories)
+            # print(start, categories[cat_list.index(start)], query_idx, "->", pred)
+            if categories[cat_list.index(start)] == pred[0]:
+                n_correct += 1
+            else:
+                sum_incorrect += pred[1]
+        print("correct: {}/{}, accuracy: {:.1f}%"
+              .format(n_correct, epochs, (n_correct * 100) / float(epochs)))
+        print("average error distance:", sum_incorrect / (epochs - n_correct))

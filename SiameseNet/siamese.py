@@ -140,17 +140,19 @@ def train(model, x, y, x_v=None, y_v=None, batch_size=128, epochs=20000, verbose
     """Training one-way one-shot learning model."""
     optimizer = tf.keras.optimizers.RMSprop()
     model.compile(loss=contrastive_loss, optimizer=optimizer, metrics=['accuracy'])
+    cb_earlystopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
     cb_checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath='./checkpoints/{epoch:02d}-{val_loss:.4f}.h5',
                                                        monitor='val_loss',
                                                        verbose=verbose,
                                                        save_best_only=True,
                                                        save_weights_only=True)
+    callbacks = [cb_checkpoint, cb_earlystopping]
     if x_v is None and y_v is None:
         model.fit([x[:, 0], x[:, 1]], y, validation_split=.25,
-                  batch_size=batch_size, epochs=epochs, verbose=verbose, callbacks=[cb_checkpoint])
+                  batch_size=batch_size, epochs=epochs, verbose=verbose, callbacks=callbacks)
     if x_v is not None and y_v is not None:
         model.fit([x[:, 0], x[:, 1]], y, validation_data=([x_v[:, 0], x_v[:, 1]], y_v),
-                  batch_size=batch_size, epochs=epochs, verbose=verbose, callbacks=[cb_checkpoint])
+                  batch_size=batch_size, epochs=epochs, verbose=verbose, callbacks=callbacks)
 
     return model
 
@@ -162,38 +164,42 @@ def compute_accuracy(y_true, y_pred):
     return np.mean(pred == y_true)
 
 
-def make_oneshot_task(query_image, x, cat, indices):
+def make_one_way_task(query_image, x, indices, category_idx):
     """Create pairs of query image, support set for testing one-way one-shot learning."""
     n_classes, n_samples = indices.shape
     pairs = []
-    select_idx = np.random.randint(0, n_samples, 1)[0]
-    support_image = x[indices[cat][select_idx]]
+    image_idx = np.random.randint(0, n_samples, 1)[0]
+    support_image = x[indices[category_idx][image_idx]]
     pairs.append([query_image, support_image])
 
     return np.array(pairs)
 
 
-def predict(model, query, x, categories, indices, epochs=20):
-    """Prediction."""
-    res = []
+def make_n_way_task(query_image, x, indices, categorise):
+    """Create pairs of query image, support set for testing n-way one-shot learning."""
+    n_classes, n_samples = indices.shape
+    pairs = []
+    for category in categorise:
+        category_idx = categorise.index(category)
+        image_idx = np.random.randint(0, n_samples, 1)[0]
+        support_image = x[indices[category_idx][image_idx]]
+        pairs.append([query_image, support_image])
 
-    for cat in categories:
-        cat_res = []
-        for e in range(epochs):
-            oneshot_pair = make_oneshot_task(query, x, categories.index(cat), indices)
-            pred = model.predict([oneshot_pair[:, 0], oneshot_pair[:, 1]])
-            cat_res.append(pred.ravel())
-        if len(cat_res) > 0:
-            p = np.mean(cat_res)
-            res.append(p)
+    return np.array(pairs)
 
-    min_distance = int(np.argmin(res))
 
-    return categories[min_distance], res[min_distance]
+def predict(model, query, x, indices, categories):
+    """Prediction. n-way"""
+    pairs = make_n_way_task(query, x, indices, categories)
+    pred = model.predict([pairs[:, 0], pairs[:, 1]])
+    pred = pred.ravel()
+    min_distance = int(np.argmin(pred))
+
+    return categories[min_distance], pred[min_distance]
 
 
 def plot_oneshot_task(pairs):
-    """Display test image and support set"""
+    """Display query image and support set"""
     fig, (ax1, ax2) = plt.subplots(2)
     ax1.matshow(pairs[0].reshape(105, 105), cmap='gray')
     ax1.get_yaxis().set_visible(False)
@@ -205,4 +211,4 @@ def plot_oneshot_task(pairs):
 
 
 if __name__ == "__main__":
-    print("siamese test")
+    print("siamese net test")
