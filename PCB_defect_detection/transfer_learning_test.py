@@ -1,5 +1,6 @@
 from PCB_defect_detection import defect_detection
 import tensorflow as tf
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -20,7 +21,7 @@ if __name__ == "__main__":
 
     """create transfer learning models"""
     pre_trained = defect_detection.get_model(include_top=False, input_shape=(32, 32, 3))
-    pre_trained.load_weights("./models/pre_trained_weight_notop.h5")
+    # pre_trained.load_weights("./checkpoints/pcb_demo_TL_model.h5")
     model = tf.keras.models.Sequential()
     model.add(pre_trained)
     model.add(tf.keras.layers.Flatten())
@@ -46,15 +47,23 @@ if __name__ == "__main__":
 
     """training"""
     epochs = 300
-    paths = './models/checkpoints/pcb_demo_{epoch:02d}_{val_loss:.4f}.h5'
+    paths = './checkpoints/pcb_demo_{epoch:02d}_{val_loss:.4f}.h5'
 
     cb_checkpoint = defect_detection.checkpoints(paths)
     cb_earlystopping = defect_detection.earlystopping()
 
-    history = model.fit_generator(train_generator,
-                                  steps_per_epoch=train_generator.samples / train_generator.batch_size,
-                                  epochs=epochs,
-                                  validation_data=validation_generator,
-                                  validation_steps=validation_generator.samples / validation_generator.batch_size,
-                                  callbacks=[cb_checkpoint, cb_earlystopping],
-                                  verbose=1)
+    # history = model.fit_generator(train_generator,
+    #                               steps_per_epoch=train_generator.samples / train_generator.batch_size,
+    #                               epochs=epochs,
+    #                               validation_data=validation_generator,
+    #                               validation_steps=validation_generator.samples / validation_generator.batch_size,
+    #                               callbacks=[cb_checkpoint, cb_earlystopping],
+    #                               verbose=2)
+
+    """testing"""
+    import cv2
+    test = cv2.imread("./test/Spurious_copper/01_spurious_copper_02_1.jpg")
+    test = np.expand_dims((test / 255.), 0)
+    model.load_weights("./checkpoints/pcb_demo_TL_model.h5")
+    # pred = model.predict(test)
+    # print(np.argmax(pred))
